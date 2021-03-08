@@ -1,0 +1,50 @@
+####################
+#                  #
+#   AspectEnxada   #
+#                  #
+####################
+
+connection:
+  mysql:
+    enable: true
+    address: "localhost:3306"
+    username: "root"
+    password: ""
+    database: "test"
+  sqlite:
+    file: "plugins/AspectEnxada/aspectenxada.sql"
+
+# Preço do /enxada
+Preço: 30000 #(TOKENS)
+
+# Encantamentos (Evolução com tokens)
+Fortuna:
+  Preço-Inicial: 10000
+  Preço-Nivel: 8000 #(A cada nível aumenta 8k de tokens)
+  Nivel-Maximo: 10 #(A cada nível aumenta 0,1%)
+
+Herbalismo:
+  Preço-Inicial: 10000
+  Preço-Nivel: 8000 #(A cada nível aumenta 8k de tokens)
+  Nivel-Maximo: 50 #(A cada nível aumenta 0,1%)
+
+Recompensador:
+  Preço-Inicial: 10000
+  Preço-Nivel: 8000 #(A cada nível aumenta 8k de tokens)
+  Nivel-Maximo: 30# (A cada nível aumenta 0,1%)
+
+#Recompensas #(Itens do Recompensador // Adicionar quantas recompensas quiser)
+1:
+  ID: 1
+  NAME: 'Pedra'
+  LORE:
+    - 'Lore de teste'
+  GIVE: false
+  COMMAND: #(Adicionar quantos comandos quiser)
+    - 'nulo'
+  MESSAGE: #(Mensagem no chat para o player, {player} mostra nome do jogador.)
+    - '&aYay, você ganhou uma &fPedra '
+  BAR: nulo (Mensagem em Action Bar)
+
+#Permissão Mercado:
+#Limite - aspectenxada.mercado.5 (o 5 é quantos items o player pode vender ao mesmo tempo)

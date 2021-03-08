@@ -1,0 +1,58 @@
+plugins {
+    id "java"
+
+    id 'me.bristermitten.pdm' version '0.0.30'
+    id 'com.github.johnrengelman.shadow' version '5.0.0'
+
+    id 'net.minecrell.plugin-yml.bukkit' version '0.3.0'
+}
+
+group 'org.example'
+version '1.0'
+
+tasks.build.dependsOn('pdm', 'shadowJar')
+
+repositories {
+    mavenCentral()
+    jcenter()
+
+    maven { url = 'https://hub.spigotmc.org/nexus/content/repositories/snapshots/' }
+    maven { url = 'https://oss.sonatype.org/content/groups/public/' }
+
+    maven { url = 'https://repo.codemc.org/repository/maven-public' }
+
+    maven { url = 'https://jitpack.io/' }
+}
+
+dependencies {
+    compileOnly fileTree(dir: 'libs', include: ['*.jar'])
+
+    implementation "com.github.HenryFabio:sql-provider:9561f20fd2"
+
+    pdm "com.github.HenryFabio:inventory-api:2.0.3"
+    pdm "com.github.SaiintBrisson:command-framework:1.1.0"
+    pdm "com.google.inject:guice:4.0"
+
+    def lombok = "org.projectlombok:lombok:1.18.16"
+    compileOnly lombok
+    annotationProcessor lombok
+}
+
+bukkit {
+    name = 'AspectEnxada'
+    main = 'com.alysonsantos.aspect.AspectEnxada'
+    authors = ['Alyson Santos']
+    version = "${project.version}"
+    depend = ['helper']
+}
+
+compileJava {
+    options.encoding = "UTF-8"
+
+    sourceCompatibility = "1.8"
+    targetCompatibility = "1.8"
+}
+
+shadowJar {
+    archiveName("${project.name}.jar")
+}
