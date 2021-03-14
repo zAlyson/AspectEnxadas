@@ -4,10 +4,11 @@ import com.alysonsantos.aspect.dao.adapter.EnxadaAdapter;
 import com.alysonsantos.aspect.model.Enxada;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import com.henryfabio.sqlprovider.executor.SQLExecutor;
+import com.henryfabio.sqlprovider.common.SQLProvider;
 import lombok.val;
 
-import java.util.Set;
+import java.sql.SQLException;
+import java.util.List;
 
 @Singleton
 public final class EnxadaDAO {
@@ -15,12 +16,11 @@ public final class EnxadaDAO {
     private final String TABLE = "aspect_enxada";
 
     @Inject
-    private SQLExecutor sqlExecutor;
+    private SQLProvider sqlProvider;
 
     public void createTable() {
-        sqlExecutor.updateQuery("CREATE TABLE IF NOT EXISTS " + TABLE + "(" +
-                "id INTEGER(16) NOT NULL PRIMARY KEY, " +
-                "owner VARCHAR(36) NOT NULL, " +
+        sqlProvider.executor().updateQuery("CREATE TABLE IF NOT EXISTS " + TABLE + "(" +
+                "owner VARCHAR(36) NOT NULL PRIMARY KEY, " +
                 "level INTEGER(16) NOT NULL, " +
                 "brokenPlantations DOUBLE NOT NULL, " +
                 "enchant_herbalism INTEGER(16) NOT NULL, " +
@@ -30,67 +30,65 @@ public final class EnxadaDAO {
     }
 
     public Enxada selectOne(String owner) {
-        return sqlExecutor.resultOneQuery(
-                "SELECT * FROM " + TABLE + "WHERE owner = ?",
-                statement -> statement.set(1, owner),
+        return sqlProvider.executor().resultOneQuery(
+                "SELECT * FROM " + TABLE + " WHERE owner = ?",
+                preparedStatement -> {
+                    try {
+                        preparedStatement.setString(1, owner);
+                    } catch (SQLException throwables) {
+                        throwables.printStackTrace();
+                    }
+                },
                 EnxadaAdapter.class
         );
     }
 
-    public Set<Enxada> selectAll() {
-        return sqlExecutor.resultManyQuery(
+    public List<Enxada> selectAll() {
+        return sqlProvider.executor().resultManyQuery(
                 "SELECT * FROM " + TABLE,
-                k -> {
-                },
                 EnxadaAdapter.class
         );
     }
 
-    public Set<Enxada> selectAll(String query) {
-        return sqlExecutor.resultManyQuery(
+    public List<Enxada> selectAll(String query) {
+        return sqlProvider.executor().resultManyQuery(
                 "SELECT * FROM " + TABLE + " " + query,
-                k -> {
-                },
                 EnxadaAdapter.class
         );
     }
 
     public void insertOne(Enxada enxada) {
-        sqlExecutor.updateQuery(
-                "INSERT INTO " + TABLE + " VALUES(?,?,?,?,?,?,?);",
-                statement -> {
-                    statement.set(1, enxada.getId());
-                    statement.set(2, enxada.getOwner());
-                    statement.set(3, enxada.getLevel());
-                    statement.set(4, enxada.getBrokenPlantions());
-
-                    val enchantments = enxada.getEnxadaEnchantments();
-                    statement.set(5, enchantments.getHerbalism());
-                    statement.set(6, enchantments.getRewarding());
-                    statement.set(7, enchantments.getWealth());
-                }
+        sqlProvider.executor().updateOneQuery(
+                "INSERT INTO " + TABLE + " VALUES(?,?,?,?,?,?);",
+                EnxadaAdapter.class,
+                enxada
         );
     }
 
     public void saveOne(Enxada enxada) {
-        sqlExecutor.updateQuery(
+        sqlProvider.executor().updateQuery(
                 String.format("REPLACE INTO %s VALUES(?,?,?,?,?,?)", TABLE),
                 statement -> {
-                    statement.set(1, enxada.getOwner());
-                    statement.set(2, enxada.getLevel());
-                    statement.set(3, enxada.getBrokenPlantions());
+                    try {
+                        statement.setString(1, enxada.getOwner());
+                        statement.setInt(2, enxada.getLevel());
+                        statement.setDouble(3, enxada.getBrokenPlantions());
 
-                    val enchantments = enxada.getEnxadaEnchantments();
-                    statement.set(4, enchantments.getHerbalism());
-                    statement.set(5, enchantments.getRewarding());
-                    statement.set(6, enchantments.getWealth());
+                        val enchantments = enxada.getEnxadaEnchantments();
+                        statement.setInt(4, enchantments.getHerbalism());
+                        statement.setInt(5, enchantments.getRewarding());
+                        statement.setInt(6, enchantments.getWealth());
+                    } catch (SQLException throwables) {
+                        throwables.printStackTrace();
+
+                    }
                 }
         );
     }
 
     public void deleteOne(Enxada enxada) {
-        sqlExecutor.updateQuery(
-                "DELETE FROM " + TABLE + " WHERE id = '" + enxada.getId() + "'"
+        sqlProvider.executor().updateQuery(
+                "DELETE FROM " + TABLE + " WHERE owner = '" + enxada.getOwner() + "'"
         );
     }
 }

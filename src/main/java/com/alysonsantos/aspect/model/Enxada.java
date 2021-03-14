@@ -4,19 +4,20 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
-@EqualsAndHashCode(of = {"id", "owner"})
+@EqualsAndHashCode(of = {"owner"})
 @Builder
 @Data
 public class Enxada {
 
     private String owner;
 
-    private int id;
-
     private int level;
+
+    private boolean storaged;
 
     private double brokenPlantions;
 
     private EnxadaEnchantments enxadaEnchantments;
+
 
 }

@@ -1,7 +1,7 @@
 plugins {
     id "java"
 
-    id 'me.bristermitten.pdm' version '0.0.30'
+   // id 'me.bristermitten.pdm' version '0.0.30'
     id 'com.github.johnrengelman.shadow' version '5.0.0'
 
     id 'net.minecrell.plugin-yml.bukkit' version '0.3.0'
@@ -10,7 +10,7 @@ plugins {
 group 'org.example'
 version '1.0'
 
-tasks.build.dependsOn('pdm', 'shadowJar')
+tasks.build.dependsOn('shadowJar')
 
 repositories {
     mavenCentral()
@@ -27,11 +27,14 @@ repositories {
 dependencies {
     compileOnly fileTree(dir: 'libs', include: ['*.jar'])
 
-    implementation "com.github.HenryFabio:sql-provider:9561f20fd2"
+    implementation "com.github.HenryFabio:inventory-api:2.0.3"
+    implementation "com.github.HenryFabio:sql-provider:1.0.0"
 
-    pdm "com.github.HenryFabio:inventory-api:2.0.3"
-    pdm "com.github.SaiintBrisson:command-framework:1.1.0"
-    pdm "com.google.inject:guice:4.0"
+    implementation "com.github.SaiintBrisson:command-framework:1.1.0"
+    implementation "com.google.inject:guice:4.0"
+//    implementation "javax.inject:javax.inject:1"
+//    implementation "aopalliance:aopalliance:1.0"
+//    implementation "org.ow2.asm:asm:8.0.1"
 
     def lombok = "org.projectlombok:lombok:1.18.16"
     compileOnly lombok
@@ -43,16 +46,21 @@ bukkit {
     main = 'com.alysonsantos.aspect.AspectEnxada'
     authors = ['Alyson Santos']
     version = "${project.version}"
-    depend = ['helper']
+    depend = ['helper', 'AspectEconomy']
 }
+
+shadowJar {
+    archiveName("${project.name}.jar")
+    relocate 'com.henryfabio.minecraft.inventoryapi', 'com.alysonsantos.libs.inventoryapi'
+    relocate 'com.henryfabio.sqlprovider', 'com.alysonsantos.libs.sqlprovider'
+    relocate 'me.bristermitten.pdm', 'com.alysonsantos.libs.pdm'
+}
+
+//jar.dependsOn project.tasks.getByName('pdm')
 
 compileJava {
     options.encoding = "UTF-8"
 
     sourceCompatibility = "1.8"
     targetCompatibility = "1.8"
-}
-
-shadowJar {
-    archiveName("${project.name}.jar")
 }

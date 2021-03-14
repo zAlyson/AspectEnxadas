@@ -5,7 +5,7 @@ import com.google.inject.AbstractModule;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import com.google.inject.name.Names;
-import com.henryfabio.sqlprovider.executor.SQLExecutor;
+import com.henryfabio.sqlprovider.common.SQLProvider;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -23,9 +23,9 @@ public class PluginModule extends AbstractModule {
                 .toInstance(aspectEnxada);
         bind(Logger.class)
                 .annotatedWith(Names.named("main"))
-                .toInstance(aspectEnxada.getLog());
-        bind(SQLExecutor.class)
-                .toInstance(new SQLExecutor(aspectEnxada.getSqlConnector()));
+                .toInstance(aspectEnxada.getLogger());
+        bind(SQLProvider.class)
+                .toInstance(aspectEnxada.getSqlProvider());
     }
 
     public Injector createInjector() {

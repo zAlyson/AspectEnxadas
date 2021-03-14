@@ -2,21 +2,40 @@ package com.alysonsantos.aspect.dao.adapter;
 
 import com.alysonsantos.aspect.model.Enxada;
 import com.alysonsantos.aspect.model.EnxadaEnchantments;
-import com.henryfabio.sqlprovider.executor.adapter.SQLResultAdapter;
-import com.henryfabio.sqlprovider.executor.result.SimpleResultSet;
+import com.henryfabio.sqlprovider.common.adapter.SQLAdapter;
+import com.henryfabio.sqlprovider.common.result.SimpleResultSet;
+import lombok.val;
 
-public final class EnxadaAdapter implements SQLResultAdapter<Enxada> {
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
 
+public final class EnxadaAdapter implements SQLAdapter<Enxada> {
 
     @Override
-    public Enxada adaptResult(SimpleResultSet resultSet) {
+    public Enxada adaptResult(SimpleResultSet resultSet) throws NullPointerException {
+        if (!resultSet.next()) {
+            return null;
+        }
+
         return Enxada.builder()
-                .id(resultSet.get("id"))
                 .owner(resultSet.get("owner"))
                 .level(resultSet.get("level"))
+                .storaged(true)
                 .brokenPlantions(resultSet.get("brokenPlantations"))
                 .enxadaEnchantments(enchantments(resultSet))
                 .build();
+    }
+
+    @Override
+    public void adaptStatement(PreparedStatement statement, Enxada target) throws SQLException {
+        statement.setString(1, target.getOwner());
+        statement.setInt(2, target.getLevel());
+        statement.setDouble(3, target.getBrokenPlantions());
+
+        val enchantments = target.getEnxadaEnchantments();
+        statement.setDouble(4, enchantments.getHerbalism());
+        statement.setDouble(5, enchantments.getRewarding());
+        statement.setDouble(6, enchantments.getWealth());
     }
 
     private final EnxadaEnchantments enchantments(SimpleResultSet resultSet) {
@@ -26,5 +45,4 @@ public final class EnxadaAdapter implements SQLResultAdapter<Enxada> {
                 .rewarding(resultSet.get("enchant_rewarding"))
                 .build();
     }
-
 }
